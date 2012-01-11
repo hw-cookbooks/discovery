@@ -1,0 +1,5 @@
+maintainer       "AJ Christensen"
+maintainer_email "aj@junglist.gen.nz"
+license          "Apache 2.0"
+description      "Installs/Configures the discovery library"
+version          "0.0.2"
