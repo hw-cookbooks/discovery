@@ -32,7 +32,7 @@ module Discovery
 
       Chef::Log.debug "ipaddress[#{options[:type]}]: attempting to determine ip address for #{options[:node].name}"
 
-      [ options[:remote_node].cloud.send("#{options[:type]}_ipv4"),
+      [ (options[:remote_node].cloud.send("#{options[:type]}_ipv4") rescue ArgumentError nil),
         options[:remote_node].ipaddress ].detect do |attribute|
         begin
           ip = attribute
