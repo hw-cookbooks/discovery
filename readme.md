@@ -1,8 +1,8 @@
 Discovery Library
 =================
 
-
-1) Search
+Search
+------
 
 You can use the #search method to locate a role, optionally
 restricted to the environment.
@@ -16,7 +16,8 @@ host = Discovery.search("any_role",
                         :environment_aware => false)
 ```
 
-2) ipaddress
+ipaddress
+---------
 
 You can use the #ipaddress method to automatically grab a prioritised
 ipaddress from a node.
