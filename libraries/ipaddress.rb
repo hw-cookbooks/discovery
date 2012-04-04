@@ -5,7 +5,7 @@ module Discovery
       raise "Must pass a node" unless node
       if node.has_key? :cloud and
           node.cloud.has_key? :provider
-        node.cloud.provider 
+        node.cloud.provider
       else
         nil
       end
@@ -32,7 +32,11 @@ module Discovery
 
       Chef::Log.debug "ipaddress[#{options[:type]}]: attempting to determine ip address for #{options[:node].name}"
 
-      [ (options[:remote_node].cloud.send("#{options[:type]}_ipv4") rescue nil),
+      [ (begin
+           options[:remote_node].cloud.send("#{options[:type]}_ipv4")
+         rescue ArgumentError
+           nil
+         end),
         options[:remote_node].ipaddress ].detect do |attribute|
         begin
           ip = attribute
@@ -48,4 +52,3 @@ module Discovery
 
   end
 end
-
