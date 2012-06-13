@@ -25,7 +25,7 @@ optionally restricted to the environment.
 Additional options:
 
 ``` ruby
-hosts = Discovery.all("base"),
+hosts = Discovery.all("base",
                       :node => node,
                       :environment_aware => true,
                       :empty_ok => false,
