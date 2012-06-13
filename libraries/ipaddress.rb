@@ -19,7 +19,7 @@ module Discovery
         nil
       end
     end
-    
+
     def ipaddress(options = {})
       raise "Options must be a hash" unless
         options.respond_to? :has_key?
@@ -46,7 +46,7 @@ module Discovery
         else
           :public
         end
-        
+
       Chef::Log.debug "ipaddress[#{options[:type]}]: attempting to determine ip address for #{options[:node].name}"
 
       [ (begin
