@@ -16,6 +16,23 @@ host = Discovery.search("any_role",
                         :environment_aware => false)
 ```
 
+All
+---
+
+You can use the #all method to locate all nodes with a role,
+optionally restricted to the environment.
+
+Additional options:
+
+``` ruby
+hosts = Discovery.all("base"),
+                      :node => node,
+                      :environment_aware => true,
+                      :empty_ok => false,
+                      :remove_self => true,
+                      :minimum_response_time => false
+```
+
 ipaddress
 ---------
 
