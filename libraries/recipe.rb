@@ -2,8 +2,8 @@ module Discovery
   module Recipe
 
     %w{search all}.each do |dsl_method|
-      define_method("discovery_#{method}") do |role='', args={}|
-        Discovery.send(method, role, {:node => node}.merge(args))
+      define_method("discovery_#{dsl_method}") do |role='', args={}|
+        Discovery.send(dsl_method, role, {:node => node}.merge(args))
       end
     end
 
