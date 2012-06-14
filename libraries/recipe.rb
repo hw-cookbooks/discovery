@@ -1,14 +1,16 @@
 module Discovery
   module Recipe
 
-    def discovery_search(role='', args={})
-      Discovery.search(role, {:node => node}.merge(args))
+    %w{search all}.each do |dsl_method|
+      define_method("discovery_#{method}") do |role='', args={}|
+        Discovery.send(method, role, {:node => node}.merge(args))
+      end
     end
 
     def discovery_ipaddress(args={})
       Discovery.ipaddress({:node => node}.merge(args))
     end
-    
+
   end
 end
 
