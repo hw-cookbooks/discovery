@@ -37,14 +37,14 @@ module Discovery
       results.reject! {|o| (Time.now.to_f - o.ohai_time) > options[:minimum_response_time]} if options[:minimum_response_time]
 
       if results.empty?
-        if !options[:remove_self] && (options[:node].run_list.include? "role[#{role}]" or options[:node].roles.include? role)
+        if options[:node].run_list.include? "role[#{role}]" or options[:node].roles.include? role
           Chef::Log.debug "discovery: empty results and local node includes role #{role}, falling back to local"
           return [options[:node]]
         elsif options[:empty_ok]
           return []
         else
           Chef::Log.debug "discovery: node run_list: #{options[:node].run_list.inspect}, roles: #{options[:node].roles.inspect}"
-          raise RuntimeError.new("No nodes matched on search and local node did not include #{role}") if results.empty?
+          raise RuntimeError.new("No nodes matched on search and local node did not include #{role}, options: #{options.inspect}") if results.empty?
         end
       end
 
