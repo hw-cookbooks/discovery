@@ -15,3 +15,4 @@ module Discovery
 end
 
 Chef::Recipe.send(:include, Discovery::Recipe)
+Chef::Resource.send(:include, Discovery::Recipe)
