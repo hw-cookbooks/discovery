@@ -3,6 +3,7 @@ require "chef/config"
 require "chef/log"
 
 module Discovery
+  class DiscoveryError < RuntimeError; end
   class << self
     def search( role = "", options = {})
       # All returns all of the nodes, they're already sorted by
@@ -34,7 +35,7 @@ module Discovery
         results = query(search)
       end
 
-      ResultProcessor.new(results, options).filter
+      ResultProcessor.new(results, options, role).filter
     end
 
     private
@@ -56,11 +57,12 @@ module Discovery
   end
 
   class ResultProcessor
-    attr_accessor :results, :options
+    attr_accessor :results, :options, :role
 
-    def initialize(results = [], options = {})
+    def initialize(results = [], options = {}, role)
       @results = results
       @options = options
+      @role = role
     end
 
     def fallback_to_local
@@ -71,7 +73,7 @@ module Discovery
     end
 
     def check_empty_and_raise
-      raise RuntimeError.new("No nodes matched on search. Options: #{options.inspect}") if empty?
+      raise DiscoveryError.new("discovery: no nodes matched on smart search for #{role}. options: #{options.inspect}") if empty?
     end
 
     def empty?
@@ -83,7 +85,7 @@ module Discovery
     end
 
     def remove_self
-      results.delete(options[:node])
+      results.reject!{ |n| n.name == options[:node].name }
     end
 
     def filter
