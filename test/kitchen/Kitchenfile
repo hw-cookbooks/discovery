@@ -1,0 +1,3 @@
+cookbook "chef-discovery" do
+  runtimes []
+end
