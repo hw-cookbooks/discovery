@@ -30,7 +30,7 @@ hosts = Discovery.all("base",
                       :environment_aware => true,
                       :empty_ok => false,
                       :remove_self => true,
-                      :minimum_response_time => false
+                      :minimum_response_time => false)
 ```
 
 ipaddress
@@ -61,4 +61,34 @@ local_ipv4 = Discovery.ipaddress(:remote_node => host,
 public_ipv4 = Discovery.ipaddress(:remote_node => host,
                                  :node => node,
                                  :type => :public)
+```
+
+
+Recipe DSL
+----------
+
+Recipe DSL versions of the search, all and ipaddress methods are avaialble for the class; using them means you do not need to explicitly pass the node:
+
+* discovery_search
+
+``` ruby
+# Note omission of :node => node 
+host = discovery_search("base",
+                        :environment_aware => true,
+                        :empty_ok => false,
+                        :remove_self => true,
+                        :minimum_response_time => false)
+```
+
+* discovery_all
+
+``` ruby
+hosts = discovery_all(...)
+```
+
+* discovery_ipaddress
+
+``` ruby
+host = discovery_search(...)
+ipaddress = discovery_ipaddress(:remote_node = host)
 ```
