@@ -67,7 +67,7 @@ public_ipv4 = Discovery.ipaddress(:remote_node => host,
 Recipe DSL
 ----------
 
-Recipe DSL versions of the search, all and ipaddress methods areavaialble for the class; using them means you do not need to explicitly pass the node:
+Recipe DSL versions of the search, all and ipaddress methods are avaialble for the class; using them means you do not need to explicitly pass the node:
 
 * discovery_search
 
@@ -89,5 +89,6 @@ hosts = discovery_all(...)
 * discovery_ipaddress
 
 ``` ruby
+host = discovery_search(...)
 ipaddress = discovery_ipaddress(:remote_node = host)
 ```
