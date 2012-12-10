@@ -20,7 +20,7 @@ module Discovery
       options[:empty_ok] = false unless options.key? :empty_ok
       options[:remove_self] = true unless options.key? :remove_self
       options[:local_fallback] = false unless options.key? :local_fallback
-      options[:minimum_response_time_sec] ||= 60 * 60 * 24
+      options[:minimum_response_time_sec] = 60 * 60 * 24 unless options.key? :minimum_response_time_sec
 
       Chef::Log.debug "discovery: doing enviornment aware search" if options[:environment_aware]
 
