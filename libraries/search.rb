@@ -5,13 +5,13 @@ require "chef/log"
 module Discovery
   class DiscoveryError < RuntimeError; end
   class << self
-    def search( role = "", options = {})
+    def search( role_or_search = "", options = {})
       # All returns all of the nodes, they're already sorted by
       # ohai_time, so grab the first one.
-      all(role, options).first
+      all(role_or_search, options).first
     end
 
-    def all( role = "", options = {})
+    def all( role_or_search = "", options = {})
       raise ArgumentError.new("You must pass a role") if role.empty?
       raise ArgumentError.new("Options must be a hash") unless options.respond_to? :has_key?
       raise ArgumentError.new("Options must contain a node key") unless options.has_key? :node
@@ -20,21 +20,26 @@ module Discovery
       options[:empty_ok] = false unless options.key? :empty_ok
       options[:remove_self] = true unless options.key? :remove_self
       options[:local_fallback] = false unless options.key? :local_fallback
+      options[:raw_search] = false unless options.key? :raw_search
       options[:minimum_response_time_sec] = 60 * 60 * 24 unless options.key? :minimum_response_time_sec
 
       Chef::Log.debug "discovery: doing enviornment aware search" if options[:environment_aware]
 
       results = []
+      search = []
 
-      case options[:environment_aware]
-      when true
-        [ "chef_environment:#{options[:node].chef_environment} AND (roles:#{role} OR role:#{role})" ]
-      when false
-        [ "roles:#{role} OR role:#{role}" ]
-      end.each do |search|
-        results = query(search)
+      if options[:environment_aware]
+        search << "chef_environment:#{options[:node].chef_environment}"
       end
 
+      if options[:raw_search]
+        search << "(#{role_or_search})"
+      else
+        # TODO: Do we need to search both role and roles? Is just roles sufficent?
+        search << "(roles:#{role_or_search} OR role:#{role_or_search})"
+      end
+
+      results = query(search.join(' AND ')
       ResultProcessor.new(results, options, role).filter
     end
 
