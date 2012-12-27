@@ -92,3 +92,16 @@ hosts = discovery_all(...)
 host = discovery_search(...)
 ipaddress = discovery_ipaddress(:remote_node = host)
 ```
+
+Raw attribute search
+--------------------
+
+Perform raw attribute searching instead of just restricting search to
+role names:
+
+```ruby
+host = Discovery.search("attr_name:attr_value",
+                        :node => node,
+                        :environment_aware => false,
+                        :raw_search => true)
+```
