@@ -1,0 +1,4 @@
+* 0.1.9
+  - Add raw search mode
+* 0.1.8
+  - Fix bugs with stale node check-in
