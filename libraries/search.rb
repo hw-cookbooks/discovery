@@ -12,7 +12,7 @@ module Discovery
     end
 
     def all( role_or_search = "", options = {})
-      raise ArgumentError.new("You must pass a role") if role.empty?
+      raise ArgumentError.new("You must pass a role") if role_or_search.empty?
       raise ArgumentError.new("Options must be a hash") unless options.respond_to? :has_key?
       raise ArgumentError.new("Options must contain a node key") unless options.has_key? :node
 
@@ -39,8 +39,8 @@ module Discovery
         search << "(roles:#{role_or_search} OR role:#{role_or_search})"
       end
 
-      results = query(search.join(' AND ')
-      ResultProcessor.new(results, options, role).filter
+      results = query(search.join(' AND '))
+      ResultProcessor.new(results, options, role_or_search).filter
     end
 
     private
@@ -71,7 +71,7 @@ module Discovery
     end
 
     def fallback_to_local
-      if empty? && options[:node].roles.include?(role)
+      if empty? && !options[:raw_search] && options[:node].roles.include?(role)
         Chef::Log.debug "discovery: node run_list: #{options[:node].run_list.inspect}, roles: #{options[:node].roles.inspect}"
         results << options[:node]
       end
