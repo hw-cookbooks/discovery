@@ -50,13 +50,21 @@ module Discovery
       Chef::Search::Query.new.search(:node, string) { |o| results << o }
 
       ohai_times = results.map do |node|
-        [ node.name, node.ohai_time ]
+        [ node.name, node.has_key?(:ohai_time) ? node.ohai_time : nil ]
       end
 
       Chef::Log.debug "discovery: found nodes with recent check in: #{ohai_times.inspect}"
 
       results.sort do |node_a, node_b|
-        node_a.ohai_time <=> node_b.ohai_time
+        if(node_a.has_key?(:ohai_time) && node_b.has_key?(:ohai_time))
+          node_a.ohai_time <=> node_b.ohai_time
+        elsif(node_a.has_key?(:ohai_time) && !node_b.has_key?(:ohai_time))
+          -1
+        elsif(!node_a.has_key?(:ohai_time) && node_b.has_key?(:ohai_time))
+          1
+        else
+          0
+        end
       end
     end
   end
