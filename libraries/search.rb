@@ -57,7 +57,7 @@ module Discovery
 
       results.sort do |node_a, node_b|
         if(node_a.has_key?(:ohai_time) && node_b.has_key?(:ohai_time))
-          node_a.ohai_time <=> node_b.ohai_time
+          node_b.ohai_time <=> node_a.ohai_time
         elsif(node_a.has_key?(:ohai_time) && !node_b.has_key?(:ohai_time))
           -1
         elsif(!node_a.has_key?(:ohai_time) && node_b.has_key?(:ohai_time))
