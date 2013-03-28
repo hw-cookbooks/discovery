@@ -72,7 +72,8 @@ module Discovery
   class ResultProcessor
     attr_accessor :results, :options, :role
 
-    def initialize(results = [], options = {}, role)
+    def initialize(results = [], options = {}, role = nil)
+      raise ArgumentError, 'Missing role value' if role.nil?
       @results = results
       @options = options
       @role = role
