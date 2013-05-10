@@ -49,14 +49,19 @@ module Discovery
 
       Chef::Log.debug "ipaddress[#{options[:type]}]: attempting to determine ip address for #{options[:node].name}"
 
-      [ (begin
-           options[:remote_node].cloud.send("#{options[:type]}_ipv4")
-         rescue ArgumentError
-           nil
-         end),
-        options[:remote_node].ipaddress ].detect do |attribute|
+      [(begin
+          if options[:remote_node].has_key? :cloud
+            options[:remote_node].cloud.send("#{options[:type]}_ipv4")
+          else
+            nil
+          end
+        rescue ArgumentError
+          nil
+        end),
+        options[:remote_node].ipaddress
+      ].detect do |attribute|
         begin
-          ip = attribute
+          attribute
         rescue StandardError => standard_error
           Chef::Log.debug "ipaddress: error #{standard_error}"
           nil
