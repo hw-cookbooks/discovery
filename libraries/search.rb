@@ -23,7 +23,7 @@ module Discovery
       options[:raw_search] = false unless options.key? :raw_search
       options[:minimum_response_time_sec] = 60 * 60 * 24 unless options.key? :minimum_response_time_sec
 
-      Chef::Log.debug "discovery: doing enviornment aware search" if options[:environment_aware]
+      Chef::Log.debug "discovery: doing environment aware search" if options[:environment_aware]
 
       results = []
       search = []
