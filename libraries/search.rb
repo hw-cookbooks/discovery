@@ -47,7 +47,7 @@ module Discovery
     def query( string )
       results = []
       Chef::Log.debug "discovery: performing search for: #{string}"
-      Chef::Search::Query.new.search(:node, string) { |o| results << o }
+      Chef::Search::Query.new.search(:node, "(#{string}) AND NOT tags:maintenance") { |o| results << o }
 
       ohai_times = results.map do |node|
         [ node.name, node.has_key?(:ohai_time) ? node.ohai_time : nil ]
