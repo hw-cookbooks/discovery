@@ -1,3 +1,6 @@
+* 0.2.2
+  - Update ip address access
+  - Add name to metadata
 * 0.2.0
   - Fix bugs introduced in raw search in 0.1.9
 * 0.1.9
