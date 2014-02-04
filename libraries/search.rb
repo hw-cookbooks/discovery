@@ -46,6 +46,9 @@ module Discovery
     private
     def query( string )
       results = []
+      if offline_tag = node[:discovery][:offline_tag]
+        string = "(#{string}) AND NOT tags:#{offline_tag}"
+      end
       Chef::Log.debug "discovery: performing search for: #{string}"
       Chef::Search::Query.new.search(:node, string) { |o| results << o }
 
