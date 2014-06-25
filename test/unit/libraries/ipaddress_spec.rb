@@ -96,9 +96,50 @@ describe Discovery do
       expect { ipaddress }.to raise_error
     end
 
-    it "works" do
+    it "requires a the type option be a symbol" do
+      opts[:type] = "local"
+      expect { ipaddress }.to raise_error
+    end
+
+    it "will return a local address if type local is provided" do
       attr_data[:cloud] = Mash.new(:local_ipv4 => "127.0.0.1")
+      opts[:type] = :local
       expect(ipaddress).to eq("127.0.0.1")
+    end
+
+    it "will return a public address if type public is provided" do
+      attr_data[:cloud] = Mash.new(:public_ipv4 => "127.0.0.1")
+      opts[:type] = :public
+      expect(ipaddress).to eq("127.0.0.1")
+    end
+
+    it "will return a labeled address if type label is provided" do
+      attr_data[:cloud] = Mash.new(:provider => "rackspace")
+      attr_data[:rackspace] = Mash.new(
+        :private_networks => [
+          {
+            :ips => [{:ip => "192.168.1.1"}],
+            :label => "foobar"
+          },
+          {
+            :ips => [{:ip => "192.168.2.2"}],
+            :label => "bazqux"
+          }
+        ]
+      )
+      opts[:type] = :label
+      opts[:label] = "foobar"
+      expect(ipaddress).to eq("192.168.1.1")
+    end
+
+    it "will raise an exception if the labeled private network does not exist" do
+      attr_data[:cloud] = Mash.new(:provider => "rackspace")
+      attr_data[:rackspace] = Mash.new(
+        :private_networks => []
+      )
+      opts[:type] = :label
+      opts[:label] = "foobar"
+      expect { ipaddress }.to raise_error
     end
 
     it "will return a public address if node providers do not match" do
