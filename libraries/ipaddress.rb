@@ -21,6 +21,13 @@ module Discovery
       end
     end
 
+    def private_network_for_label(node, label)
+      cloud_provider = node[:cloud][:provider]
+      node[cloud_provider][:private_networks].detect do |network|
+        network[:label] == label
+      end
+    end
+
     def ipaddress(options = {})
       raise "Options must be a hash" unless
         options.respond_to? :has_key?
@@ -30,7 +37,7 @@ module Discovery
         options.has_key? :remote_node
       raise "Options type is invalid" if
         options.has_key? :type and not
-          [:local, :public].include?(options[:type])
+          [:local, :public, :label].include?(options[:type])
 
       options[:type] ||=
         if provider_for_node(options[:remote_node]) == provider_for_node(options[:node])
@@ -49,8 +56,14 @@ module Discovery
 
       Chef::Log.debug "ipaddress[#{options[:type]}]: attempting to determine ip address for #{options[:node].name}"
 
-      cloud_ipv4 = options[:remote_node][:cloud]["#{options[:type]}_ipv4"] rescue nil
-      cloud_ipv4 || options[:remote_node][:ipaddress]
+      case options[:type]
+      when :label
+        network = private_network_for_label(options[:remote_node], options[:label])
+        network[:ips][0][:ip]
+      else
+        cloud_ipv4 = options[:remote_node][:cloud]["#{options[:type]}_ipv4"] rescue nil
+        cloud_ipv4 || options[:remote_node][:ipaddress]
+      end
     end
 
   end
