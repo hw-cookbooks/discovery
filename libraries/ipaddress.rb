@@ -12,11 +12,19 @@ module Discovery
     end
 
     def region_for_ec2_node(node)
+      raise "Must pass a node" unless node
       if node.has_key? :ec2 and
           node.ec2.has_key? :placement_availability_zone
         node[:ec2][:placement_availability_zone].gsub(/(\d+).+/,'\1')
       else
         nil
+      end
+    end
+
+    def private_network_for_label(node, label)
+      cloud_provider = node[:cloud][:provider]
+      node[cloud_provider][:private_networks].detect do |network|
+        network[:label] == label
       end
     end
 
@@ -28,9 +36,8 @@ module Discovery
       raise "Options does not contain a remote_node key" unless
         options.has_key? :remote_node
       raise "Options type is invalid" if
-        options.has_key? :type and
-        options[:type].is_a? Symbol and not
-        [:local, :public].any? { |o| o == options[:type] }
+        options.has_key? :type and not
+          [:local, :public, :label].include?(options[:type])
 
       options[:type] ||=
         if provider_for_node(options[:remote_node]) == provider_for_node(options[:node])
@@ -49,26 +56,13 @@ module Discovery
 
       Chef::Log.debug "ipaddress[#{options[:type]}]: attempting to determine ip address for #{options[:node].name}"
 
-      [(begin
-          if options[:remote_node].has_key? :cloud
-            options[:remote_node].cloud.send("#{options[:type]}_ipv4")
-          else
-            nil
-          end
-        rescue ArgumentError
-          nil
-        end),
-        options[:remote_node].ipaddress
-      ].detect do |attribute|
-        begin
-          attribute
-        rescue StandardError => standard_error
-          Chef::Log.debug "ipaddress: error #{standard_error}"
-          nil
-        rescue Exception => exception
-          Chef::Log.debug "ipaddress: exception #{exception}"
-          nil
-        end
+      case options[:type]
+      when :label
+        network = private_network_for_label(options[:remote_node], options[:label])
+        network[:ips][0][:ip]
+      else
+        cloud_ipv4 = options[:remote_node][:cloud]["#{options[:type]}_ipv4"] rescue nil
+        cloud_ipv4 || options[:remote_node][:ipaddress]
       end
     end
 
