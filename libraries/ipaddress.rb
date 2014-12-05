@@ -73,6 +73,32 @@ module Discovery
       else
         cloud_ipv4 = options[:remote_node][:cloud]["#{options[:type]}_ipv4"] rescue nil
         cloud_ipv4 || options[:remote_node][:ipaddress]
+      [(begin
+          if options[:remote_node].has_key? :cloud
+            options[:remote_node].cloud.send("#{options[:type]}_ipv4")
+          else
+            nil
+          end
+        rescue ArgumentError
+          nil
+        end),
+         if options[:ipaddress_attribute]
+           options[:ipaddress_attribute].split('.').inject(options[:remote_node]) do |memo, key|
+             memo[key] || break
+           end
+         else
+           options[:remote_node].ipaddress
+         end
+      ].detect do |attribute|
+        begin
+          attribute
+        rescue StandardError => standard_error
+          Chef::Log.debug "ipaddress: error #{standard_error}"
+          nil
+        rescue Exception => exception
+          Chef::Log.debug "ipaddress: exception #{exception}"
+          nil
+        end
       end
     end
 
