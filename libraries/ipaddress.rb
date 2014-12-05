@@ -21,7 +21,8 @@ module Discovery
     end
 
     def ipaddress(options = {})
-      raise "Options must be a hash" unless
+      options = Mash.new(options)
+      raise "Options must be a mash" unless
         options.respond_to? :has_key?
       raise "Options does not contain a node key" unless
         options.has_key? :node
@@ -29,8 +30,8 @@ module Discovery
         options.has_key? :remote_node
       raise "Options type is invalid" if
         options.has_key? :type and
-        options[:type].is_a? Symbol and not
-        [:local, :public].any? { |o| o == options[:type] }
+        (options[:type].is_a? Symbol || options[:type].is_a? String) and not
+        ['local', 'public'].any? { |o| o == options[:type].to_s }
 
       options[:type] ||=
         if provider_for_node(options[:remote_node]) == provider_for_node(options[:node])
