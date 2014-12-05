@@ -59,7 +59,13 @@ module Discovery
         rescue ArgumentError
           nil
         end),
-        options[:remote_node].ipaddress
+         if options[:ipaddress_attribute]
+           options[:ipaddress_attribute].split('.').inject(options[:remote_node]) do |memo, key|
+             memo[key] || break
+           end
+         else
+           options[:remote_node].ipaddress
+         end
       ].detect do |attribute|
         begin
           attribute
