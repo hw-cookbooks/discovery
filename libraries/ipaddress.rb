@@ -72,6 +72,11 @@ module Discovery
         network[:ips][0][:ip]
       else
         cloud_ipv4 = options[:remote_node][:cloud]["#{options[:type]}_ipv4"] rescue nil
+        if options[:ipaddress_attribute]
+          cloud_ipv4 = options[:ipaddress_attribute].split('.').inject(options[:remote_node]) do |memo, key|
+            memo[key] || break
+          end
+        end
         cloud_ipv4 || options[:remote_node][:ipaddress]
       end
     end
