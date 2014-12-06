@@ -29,15 +29,25 @@ module Discovery
     end
 
     def ipaddress(options = {})
-      raise "Options must be a hash" unless
-        options.respond_to? :has_key?
-      raise "Options does not contain a node key" unless
-        options.has_key? :node
-      raise "Options does not contain a remote_node key" unless
-        options.has_key? :remote_node
-      raise "Options type is invalid" if
-        options.has_key? :type and not
-          [:local, :public, :label].include?(options[:type])
+      options = Mash.new(options)
+
+      unless options.respond_to? :has_key?
+        raise "Options must be a mash"
+      end
+
+      unless options.has_key? :node
+        raise "Options does not contain a node key"
+      end
+
+      unless  options.has_key? :remote_node
+        raise "Options does not contain a remote_node key"
+      end
+
+      if options.has_key? :type
+        unless ['local', 'public', 'label'].include?(options[:type].to_s)
+          raise "Options type is invalid"
+        end
+      end
 
       options[:type] ||=
         if provider_for_node(options[:remote_node]) == provider_for_node(options[:node])
@@ -56,12 +66,17 @@ module Discovery
 
       Chef::Log.debug "ipaddress[#{options[:type]}]: attempting to determine ip address for #{options[:node].name}"
 
-      case options[:type]
+      case options[:type].to_sym
       when :label
         network = private_network_for_label(options[:remote_node], options[:label])
         network[:ips][0][:ip]
       else
         cloud_ipv4 = options[:remote_node][:cloud]["#{options[:type]}_ipv4"] rescue nil
+        if options[:ipaddress_attribute]
+          cloud_ipv4 = options[:ipaddress_attribute].split('.').inject(options[:remote_node]) do |memo, key|
+            memo[key] || break
+          end
+        end
         cloud_ipv4 || options[:remote_node][:ipaddress]
       end
     end
