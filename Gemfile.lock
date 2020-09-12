@@ -25,7 +25,7 @@ GEM
       ffi (~> 1.0, >= 1.0.6)
     coderay (0.9.8)
     erubis (2.7.0)
-    ffi (1.1.5)
+    ffi (1.13.1)
     foodcritic (1.2.0)
       gherkin (~> 2.8.0)
       gist (~> 2.0.4)
