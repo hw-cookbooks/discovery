@@ -1,5 +1,5 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 group :test do
-  gem "test-kitchen"
+  gem 'test-kitchen'
 end

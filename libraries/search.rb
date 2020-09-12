@@ -1,20 +1,20 @@
-require "chef/search/query"
-require "chef/config"
-require "chef/log"
+require 'chef/search/query'
+require 'chef/config'
+require 'chef/log'
 
 module Discovery
   class DiscoveryError < RuntimeError; end
   class << self
-    def search( role_or_search = "", options = {})
+    def search(role_or_search = '', options = {})
       # All returns all of the nodes, they're already sorted by
       # ohai_time, so grab the first one.
       all(role_or_search, options).first
     end
 
-    def all( role_or_search = "", options = {})
-      raise ArgumentError.new("You must pass a role") if role_or_search.empty?
-      raise ArgumentError.new("Options must be a hash") unless options.respond_to? :has_key?
-      raise ArgumentError.new("Options must contain a node key") unless options.has_key? :node
+    def all(role_or_search = '', options = {})
+      raise ArgumentError, 'You must pass a role' if role_or_search.empty?
+      raise ArgumentError, 'Options must be a hash' unless options.respond_to? :has_key?
+      raise ArgumentError, 'Options must contain a node key' unless options.has_key? :node
 
       options[:environment_aware] = false unless options.key? :environment_aware
       options[:empty_ok] = false unless options.key? :empty_ok
@@ -23,7 +23,7 @@ module Discovery
       options[:raw_search] = false unless options.key? :raw_search
       options[:minimum_response_time_sec] = 60 * 60 * 24 unless options.key? :minimum_response_time_sec
 
-      Chef::Log.debug "discovery: doing enviornment aware search" if options[:environment_aware]
+      Chef::Log.debug 'discovery: doing enviornment aware search' if options[:environment_aware]
 
       results = []
       search = []
@@ -32,19 +32,20 @@ module Discovery
         search << "chef_environment:#{options[:node].chef_environment}"
       end
 
-      if options[:raw_search]
-        search << "(#{role_or_search})"
-      else
-        # TODO: Do we need to search both role and roles? Is just roles sufficent?
-        search << "(roles:#{role_or_search} OR role:#{role_or_search})"
-      end
+      search << if options[:raw_search]
+                  "(#{role_or_search})"
+                else
+                  # TODO: Do we need to search both role and roles? Is just roles sufficent?
+                  "(roles:#{role_or_search} OR role:#{role_or_search})"
+                end
 
       results = query(search.join(' AND '))
       ResultProcessor.new(results, options, role_or_search).filter
     end
 
     private
-    def query( string )
+
+    def query(string)
       results = []
       Chef::Log.debug "discovery: performing search for: #{string}"
       Chef::Search::Query.new.search(:node, string) { |o| results << o }
@@ -56,11 +57,11 @@ module Discovery
       Chef::Log.debug "discovery: found nodes with recent check in: #{ohai_times.inspect}"
 
       results.sort do |node_a, node_b|
-        if(node_a.has_key?(:ohai_time) && node_b.has_key?(:ohai_time))
+        if node_a.has_key?(:ohai_time) && node_b.has_key?(:ohai_time)
           node_a.ohai_time <=> node_b.ohai_time
-        elsif(node_a.has_key?(:ohai_time) && !node_b.has_key?(:ohai_time))
+        elsif node_a.has_key?(:ohai_time) && !node_b.has_key?(:ohai_time)
           -1
-        elsif(!node_a.has_key?(:ohai_time) && node_b.has_key?(:ohai_time))
+        elsif !node_a.has_key?(:ohai_time) && node_b.has_key?(:ohai_time)
           1
         else
           0
@@ -86,7 +87,7 @@ module Discovery
     end
 
     def check_empty_and_raise
-      raise DiscoveryError.new("discovery: no nodes matched on smart search for #{role}. options: #{options.inspect}") if empty?
+      raise DiscoveryError, "discovery: no nodes matched on smart search for #{role}. options: #{options.inspect}" if empty?
     end
 
     def empty?
@@ -94,11 +95,11 @@ module Discovery
     end
 
     def remove_stale
-      results.reject! {|o| (Time.now.to_f - o.ohai_time) > options[:minimum_response_time_sec]}
+      results.reject! { |o| (Time.now.to_f - o.ohai_time) > options[:minimum_response_time_sec] }
     end
 
     def remove_self
-      results.reject!{ |n| n.name == options[:node].name }
+      results.reject! { |n| n.name == options[:node].name }
     end
 
     def filter
@@ -110,5 +111,4 @@ module Discovery
       results
     end
   end
-
 end
