@@ -115,7 +115,7 @@ GEM
       net-scp (~> 1.0.4)
       net-ssh (~> 2.2.2)
     yajl-ruby (1.1.0)
-    yard (0.8.2.1)
+    yard (0.9.25)
 
 PLATFORMS
   ruby
