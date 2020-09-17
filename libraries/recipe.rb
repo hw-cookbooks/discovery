@@ -7,7 +7,7 @@ module Discovery
     end
 
     def discovery_ipaddress(args = {})
-      Discovery.ipaddress({ node: node}.merge(args))
+      Discovery.ipaddress({ node: node }.merge(args))
     end
   end
 end
