@@ -6,11 +6,11 @@ module Discovery
       end
     end
 
-    def discovery_ipaddress(args={})
-      Discovery.ipaddress({node: node}.merge(args))
+    def discovery_ipaddress(args = {})
+      Discovery.ipaddress({ node: node}.merge(args))
     end
   end
 end
 
-Chef::Recipe.include Discovery::Recipe
+Chef::DSL::Recipe.include Discovery::Recipe
 Chef::Resource.include Discovery::Recipe
